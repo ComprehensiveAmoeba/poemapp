@@ -14,7 +14,6 @@ backgrounds = {
     "Fondo 4": "https://cataluz.click/wp-content/uploads/2025/03/fondo-4.png",
 }
 
-# Font paths fixed
 base_path = os.path.dirname(__file__)
 fonts = {
     "Arial": os.path.join(base_path, "fonts", "Arial.ttf"),
@@ -54,7 +53,7 @@ def create_image():
     margin_x = int(background.width * 0.15)
     margin_y = int(background.height * 0.12)
     max_width = background.width - 2 * margin_x
-    max_height = background.height - 3 * margin_y
+    max_height = background.height - 4 * margin_y
 
     try:
         font = ImageFont.truetype(fonts[font_choice], 60)
@@ -84,19 +83,20 @@ def create_image():
     # Final text position
     text_bbox = draw.multiline_textbbox((0, 0), wrapped_text, font=font, spacing=line_spacing)
     x = (background.width - (text_bbox[2] - text_bbox[0])) // 2
-    y = (background.height - (text_bbox[3] - text_bbox[1])) // 2
+    y = margin_y
 
     draw.multiline_text((x, y), wrapped_text, font=font, fill="black", spacing=line_spacing, align=alignment_map[alignment])
 
     # Add signature
     if signature:
-        sig_font = ImageFont.truetype(fonts.get("Arial"), font_size, layout_engine=ImageFont.Layout.BASIC)
+        sig_font_size = max(font_size - 2, 10)
+        sig_font = ImageFont.truetype(fonts[font_choice], sig_font_size)
         sig_text = f"- {signature}"
         sig_bbox = draw.textbbox((0, 0), sig_text, font=sig_font)
         sig_width = sig_bbox[2] - sig_bbox[0]
         sig_height = sig_bbox[3] - sig_bbox[1]
         sig_x = background.width - sig_width - margin_x
-        sig_y = background.height - sig_height - margin_y
+        sig_y = y + (text_bbox[3] - text_bbox[1]) + margin_y // 2
         draw.text((sig_x, sig_y), sig_text, font=sig_font, fill="black")
 
     # Add watermark
@@ -107,7 +107,7 @@ def create_image():
         wm_size = (int(watermark.width * wm_ratio), int(watermark.height * wm_ratio))
         watermark = watermark.resize(wm_size, Image.LANCZOS)
         wm_x = (background.width - watermark.width) // 2
-        wm_y = background.height - watermark.height - 30
+        wm_y = background.height - watermark.height - margin_y
         background.alpha_composite(watermark, (wm_x, wm_y))
 
     return background.convert("RGB")
