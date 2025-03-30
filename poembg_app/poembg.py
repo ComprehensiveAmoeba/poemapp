@@ -1,9 +1,9 @@
-
 import streamlit as st
 from PIL import Image, ImageDraw, ImageFont
 import requests
 from io import BytesIO
 import textwrap
+import os
 
 st.set_page_config(page_title="Creador de Poemas", layout="centered")
 
@@ -13,11 +13,15 @@ backgrounds = {
     "Fondo 3": "https://cataluz.click/wp-content/uploads/2025/03/fondo3.png",
     "Fondo 4": "https://cataluz.click/wp-content/uploads/2025/03/fondo-4.png",
 }
+
+# Font paths fixed
+base_path = os.path.dirname(__file__)
 fonts = {
-    "Arial": "fonts/Arial.ttf",
-    "Máquina de escribir": "fonts/Courier.ttf",
-    "Manuscrita": "fonts/DancingScript-Regular.ttf",
+    "Arial": os.path.join(base_path, "fonts", "Arial.ttf"),
+    "Máquina de escribir": os.path.join(base_path, "fonts", "Courier.ttf"),
+    "Manuscrita": os.path.join(base_path, "fonts", "DancingScript-Regular.ttf"),
 }
+
 watermark_url = "https://cataluz.click/wp-content/uploads/2025/03/Feliz__1_-removebg-preview-1024x171-1-10-2-2-1-2-1-1-2-1-1-2-1-1-1-2-1-3-2-3-2-2-2-2-2-2-2-1-1-1-1-2-1-1-1-2-1-4-2-2-2-2-2-1-2-2-3-1-2-1-2-1-2-2-2-1-1-2-1-1-1-1.webp"
 
 st.title("🖋️ Creador de Poemas con Estilo")
@@ -66,7 +70,7 @@ def create_image():
         wrapper = textwrap.TextWrapper(width=100)
         wrapped_lines = []
         for line in texto.split("\n"):
-            estimated_chars = int(max_width / font.getlength("A"))  # approx
+            estimated_chars = int(max_width / font.getlength("A"))
             wrapper.width = estimated_chars
             wrapped_lines.extend(wrapper.wrap(line) or [""])
         wrapped_text = "\n".join(wrapped_lines)
