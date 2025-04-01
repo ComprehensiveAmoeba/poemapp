@@ -33,6 +33,11 @@ spacing_option = st.selectbox("📏 Espaciado de líneas:", ["Apretado", "Normal
 signature = st.text_input("✍️ Añade tu firma (opcional):")
 add_watermark = st.checkbox("🎄 Añadir 'Feliz Navidad' al pie")
 
+# Watermark adjustment sliders
+wm_scale = st.slider("📐 Tamaño de 'Feliz Navidad'", 30, 100, 50) if add_watermark else 50
+wm_vertical = st.slider("⬆️ Posición vertical de 'Feliz Navidad'", 0, 100, 10) if add_watermark else 10
+wm_horizontal = st.slider("➡️ Posición horizontal de 'Feliz Navidad'", -50, 50, 0) if add_watermark else 0
+
 alignment_map = {
     "Izquierda": "left",
     "Centro": "center",
@@ -103,11 +108,11 @@ def create_image():
     if add_watermark:
         wm_response = requests.get(watermark_url)
         watermark = Image.open(BytesIO(wm_response.content)).convert("RGBA")
-        wm_ratio = background.width / watermark.width * 0.5
+        wm_ratio = background.width / watermark.width * (wm_scale / 100)
         wm_size = (int(watermark.width * wm_ratio), int(watermark.height * wm_ratio))
         watermark = watermark.resize(wm_size, Image.LANCZOS)
-        wm_x = (background.width - watermark.width) // 2
-        wm_y = background.height - watermark.height - margin_y
+        wm_x = (background.width - watermark.width) // 2 + wm_horizontal
+        wm_y = background.height - watermark.height - int((margin_y * wm_vertical) / 10)
         background.alpha_composite(watermark, (wm_x, wm_y))
 
     return background.convert("RGB")
